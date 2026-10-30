@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script>
+		(() => {
+			const theme = localStorage.getItem("theme");
+			if (theme) {
+				document.documentElement.dataset.theme = theme;
+				document.documentElement.style.colorScheme = theme;
+			}
+		})();
+	</script>
+	<link rel="stylesheet" href="/assets/css/highlight.css">
+	<link rel="stylesheet" href="/assets/fonts/fonts.css">
+	<link rel="stylesheet" href="/assets/css/main.css">
+	<link rel="stylesheet" href="/assets/css/theme.css">
+	
+	<link rel="canonical" href="https://www.spelis.li/blog/fancyindex/">
+
+	
+	
+	<title>Finally replaced NGINX&#39;s Autoindex - Spelis</title>
+	
+	
+
+
+    
+
+
+<meta name="description" content="share.spelis.li now uses FancyIndex instead of the built-in Autoindex">
+
+
+	<meta name="twitter:title" content="Finally replaced NGINX&#39;s Autoindex">
+
+<meta name="twitter:description" content="share.spelis.li now uses FancyIndex instead of the built-in Autoindex">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="/og-images/d069a6ec.png">
+<meta name="twitter:image:width" content="1200">
+<meta name="twitter:image:height" content="630">
+<meta property="og:image" content="/og-images/d069a6ec.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/png">
+
+
+	<link rel="shortcut icon" href=" /favicon.ico" type="image/png">
+</head>
+
+<body>
+	<div class="solidbg">
+		<header>
+			<a href=" /" class="logo">
+				<svg viewBox="0 0 8.210102 11.854794" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+
+   <path style="fill:currentColor" d="M 0,9.38e-5 V 1.437139 a 1.4440142,1.4440142 0 0 1 0,0.00703 c 0,2.8881221 1.520798,4.0808931 3.549877,5.8077291 1.369481,1.165505 2.970532,2.574299 3.866716,4.6028159 h 0.79351 v -1.433092 c 0,-0.0039 0,-0.0077 0,-0.01156 C 8.206003,7.5302861 6.686602,6.3385131 4.660225,4.6139601 3.288244,3.4463431 1.683991,2.0344703 0.7888061,0 Z m 4.035486,0 C 4.666444,0.8513706 5.538221,1.56894 6.531863,2.4145916 7.074333,2.8762621 7.653148,3.3761221 8.210103,3.9375611 V 9.38e-5 Z M 0,7.9284681 V 11.854794 H 4.166287 C 3.535971,11.008361 2.66749,10.293417 1.678162,9.4514371 1.135676,8.9897671 0.5569082,8.4899071 0,7.9284681 Z"></path>
+</svg>
+				<h1>Spelis</h1>
+			</a>
+			<button id="menu-open" aria-label="Navmenu open" class="mobile-menu">[OPEN]</button>
+			<nav id="menu">
+    <button aria-label="Navmenu close" id="menu-close" class="mobile-menu">[CLOSE]</button>
+    <ul>
+				<li><a id="font-toggle" no-transition="" class="morph" href="#" onclick="return false;">Aa</a></li>
+				<li><a id="theme-toggle" no-transition="" href="#" onclick="return false;"><div id="theme-icon"></div><span></span></a></li><li>
+                <a no-transition="" href="https://git.spelis.li/Spelis">Git</a>
+            </li></ul>
+</nav>
+
+		</header>
+		<main>
+			
+  <h1>
+	<br>
+	Finally replaced NGINX&#39;s Autoindex</h1>
+  <div>
+    <p>Jeez, I've been dreading this moment for so long, and it wasn't even a hassle.</p>
+<p>So I finally set up FancyIndex for NGINX because the built-in autoindex honestly sucks genuine ass. Okay, maybe that's a little harsh. It works. It lists files. It does exactly what it says on the tin. But aesthetically? It's basically a directory listing with unstyled HTML from the stone age.</p>
+<p>For the longest time I'd been putting this off because I assumed it'd be one of those projects where you spend six hours reading documentation, rebuilding NGINX with some obscure module, sacrificing a goat to the package manager, and still end up with a blank page and three cryptic error messages.</p>
+<p>Instead, it took me a few minutes.</p>
+<p>Most of the work wasn't even getting FancyIndex running. The hardest part was deciding how I wanted it to look. It supports custom headers, footers, CSS, sorting, hiding files, and a bunch of little quality-of-life features that make a file index feel like it actually belongs on your website instead of looking like your web server accidentally exposed a folder.</p>
+<p>The best part is that it's still just a directory listing. No JavaScript monstrosity, no database, no fancy backend. Drop files into a directory (well, only I have FTP access so sucks to be you) and they're immediately available. That's exactly what I wanted.</p>
+<p>I don't know why I kept procrastinating on this one. I guess &quot;I'll do it later&quot; eventually became &quot;I've been saying that for over a year.&quot; Turns out the solution was just... reading the documentation for once.</p>
+<p>As usual, the thing I'd built up in my head as an enormous nightmare turned out to be one of the easiest upgrades I've made to the server.</p>
+<p>I probably should stop doing that.</p>
+<p>...Nah.</p>
+<h3>slight note here</h3>
+<p>The only issue I had was that the CSS href didn't want to work so I just caved and shoved a <code>&lt;link&gt;</code> in the header.html</p>
+
+  </div>
+	<hr>
+	<div class="post-info">
+		<small>Tuesday, July 07 2026 | 2027 bytes</small>
+	</div>
+	
+
+	<div class="post-nav">
+		
+			<a href="/blog/synth/">&lt</a>
+		
+
+		
+			<a href="/blog/pipedals/" style="float:right;">&gt</a>
+		
+	</div>
+
+		</main>
+
+		<footer>
+			<div class="social"><a no-transition="" href="mailto:spelis@spelis.li" target="_blank" class="morph" data-alt="spelis@spelis.li">E-Mail</a></div>
+		</footer>
+
+		<script src="/assets/js/main.js"></script>
+		
+		<script src="/assets/js/theme_switch.js"></script>
+		<script src="/assets/js/font.js"></script>
+		<script defer="" src="/assets/js/lib/quicklink.umd.js"></script>
+
+		<script>
+			window.addEventListener('load', () => {
+				quicklink.listen();
+			});
+		</script>
+
+		<script src=" /assets/js/morph.js"></script>
+	</div>
+</body>
+
+</html>

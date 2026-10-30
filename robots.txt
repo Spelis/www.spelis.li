@@ -1,0 +1,6 @@
+# robots.txt :3
+
+User-agent: *
+Allow: /
+
+Sitemap: https://www.spelis.li/sitemap.xml

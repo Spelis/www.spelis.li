@@ -1,0 +1,100 @@
+div.codeblock {
+	background: var(--code);
+	color: var(--code-text);
+	font-size: 1em;
+	direction: ltr;
+	text-align: left;
+	padding: 1em;
+	margin: 0.5em 0;
+}
+
+div.codeblock-header {
+	color: var(--syntax-comment);
+}
+
+code[class*="language-"],
+pre[class*="language-"] {
+	font-size: 1em;
+	direction: ltr;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	line-height: 1.5;
+	-moz-tab-size: 2;
+	-o-tab-size: 2;
+	tab-size: 2;
+	/* The following properties are also standard */
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+	margin-block-end: 0;
+}
+
+/* Properties specific to inline code */
+:not(pre)>code[class*="language-"] {
+	padding: 0.2em 0.3em;
+	border-radius: 0.5rem;
+	white-space: normal;
+	/* this is standard */
+}
+
+.token.comment,
+.token.prolog,
+.token.cdata {
+	color: var(--syntax-comment);
+}
+
+.token.punctuation,
+.token.operator {
+	color: var(--syntax-operator);
+}
+
+.token.builtin,
+.token.constant,
+.token.boolean {
+	color: var(--syntax-number);
+}
+
+.token.number {
+	color: var(--syntax-number);
+}
+
+.token.keyword,
+.token.property,
+.token.atrule,
+.token.important {
+	color: var(--syntax-keyword);
+}
+
+.token.tag,
+.token.class-name,
+.token.symbol,
+.token.inserted,
+.token.doctype {
+	color: var(--syntax-type);
+}
+
+.token.function,
+.token.attr-name,
+.token.selector,
+.token.deleted {
+	color: var(--syntax-function);
+}
+
+.token.string,
+.token.char,
+.token.attr-value {
+	color: var(--syntax-string);
+}
+
+.token.regex {
+	color: var(--syntax-regex);
+}
+
+.token.variable,
+.token.entity,
+.token.url {
+	color: var(--syntax-variable);
+}
