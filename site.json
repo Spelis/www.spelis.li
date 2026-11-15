@@ -1,0 +1,14 @@
+{
+	"$schema": "https://net.projnull.eu/api/schemas/network.json",
+	"name": "Spelis",
+	"description": "My personal portfolio",
+	"categories": [
+		"Developer",
+		"Portfolio"
+	],
+	"refs": [
+		"projnull.eu",
+		"git.spelis.li",
+		"share.spelis.li"
+	]
+}

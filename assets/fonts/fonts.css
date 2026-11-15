@@ -1,0 +1,44 @@
+@font-face {
+	font-family: "Kode Mono";
+	font-weight: normal;
+	font-style: normal;
+	src:
+		local("Kode Mono"),
+		url("./KodeMono.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "Kode Mono";
+	font-weight: bold;
+	font-style: normal;
+	src:
+		local("Kode Mono"),
+		url("./KodeMonoBold.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "OpenDyslexic";
+	font-weight: normal;
+	font-style: normal;
+	src:
+		local("Dyslexic"),
+		url("./Dyslexic.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "ComicSans";
+	font-weight: normal;
+	font-style: normal;
+	src:
+		local("Comic Sans MS"),
+		url("./ComicSans.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "Agave";
+	font-weight: normal;
+	font-style: normal;
+	src:
+		local("Agave"),
+		url("./Agave.woff2") format("woff2");
+}

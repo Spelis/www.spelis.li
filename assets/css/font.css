@@ -1,0 +1,21 @@
+:root,
+:root[data-font="default"] {
+	--font-family: "Kode Mono", monospace;
+}
+
+:root[data-font="agave"] {
+	--font-family: "Agave", monospace;
+}
+
+:root[data-font="comic"] {
+	--font-family: "ComicSans", monospace;
+}
+
+:root[data-font="dyslexic"] {
+	--font-family: "OpenDyslexic", monospace;
+	line-height: 1.4;
+}
+
+* {
+	font-family: var(--font-family);
+}

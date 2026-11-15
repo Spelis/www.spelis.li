@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+	<channel>
+		<title>Spelis</title>
+		<link>https://www.spelis.li</link>
+		<description>I'm Spelis.</description>
+
+		
+		<item>
+			<title>This website now uses 11ty!</title>
+      <link>https://www.spelis.li/blog/11ty/</link>
+      <description>New site created by Jan Palma</description>
+      <pubDate>Sat, 14 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://www.spelis.li/blog/11ty/</guid>
+
+			<content:encoded><![CDATA[
+					<p>Thanks to my friend Jan Palma for making the website! (check him out <a href="https://janpalma.cz/" target="_blank">here</a>)</p>
+<p>The website uses <a href="https://www.11ty.dev/" target="_blank">11ty</a> which is a simple static site generator.</p>
+
+			]]></content:encoded>
+		</item>
+		
+		<item>
+			<title>Made a Pastebin site :P</title>
+      <link>https://www.spelis.li/blog/cbin/</link>
+      <description>A FIFO pastebin server written in C + Web tech.</description>
+      <pubDate>Thu, 07 May 2026 00:00:00 GMT</pubDate>
+      <guid>https://www.spelis.li/blog/cbin/</guid>
+
+			<content:encoded><![CDATA[
+					<p>These past few days I've spent my time working on a project called CBin, along with my friend Jan Palma (who made the frontend). It is a pastebin server written in C (if you couldn't tell)</p>
+<p>It takes text, stores it in memory, and hands it back when asked. No accounts, no fluff, no &quot;yeah stick this OAuth up your ass or fuck off&quot;.</p>
+<p>It runs entirely in-memory with FIFO eviction (sadly kind of slow, but fast enough to where it's unnoticable), meaning old pastes get yeeted off the face of the earth when things get full.</p>
+<p>The frontend lives in a separate universe (HTML/Typescript/CSS), maintained by Jan Palma, because I have no will to make a frontend myself (shit would look straight out of 1998)</p>
+<p>Overall, CBin is fast (fast enough), small, and mildly feral. It does one job, doesn't apologize for anything, and will absolutely forget your data if you blink wrong, or I get a power outage for more than a day. Not exactly the most memory safe but whatever. It's good enough to where if you aren't actively trying, you won't even notice.</p>
+
+			]]></content:encoded>
+		</item>
+		
+		<item>
+			<title>Dead simple digital guitar pedals in C</title>
+      <link>https://www.spelis.li/blog/pipedals/</link>
+      <description>Simple guitar pedals with PCM in C.</description>
+      <pubDate>Mon, 25 May 2026 00:00:00 GMT</pubDate>
+      <guid>https://www.spelis.li/blog/pipedals/</guid>
+
+			<content:encoded><![CDATA[
+					<p>There's something I hate about the entire &quot;professional digital audio workstation ecosystem&quot;, it's the complexity.</p>
+<p>Now I get why its so complex, it's for user simplicity. But I'm a programmer, I love tinkering, and I especially like simplicity in developing.</p>
+<p>Simplicity kind of fights the whole idea of VST plugins (or similar things). They have big SDKs that require you to conform to it's philosophies and all that bullshit.</p>
+<p>So I just replaced the entire workflow with this:</p>
+<p><code>arecord | weird little C pedal programs | aplay</code></p>
+<p>And somehow it just works. It just builds on Unix philosophies of making simple and transparent software, as well as using pipes and simple Linux tools (<code>aplay</code>, <code>arecord</code>)</p>
+<p>Each little pedal works something like this: (C pseudocode)</p>
+
+		<div class="codeblock">
+			<div class="codeblock-header">C</div>
+			<pre class="language-c"><code class="language-c"><span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span>argv<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">init_arg</span><span class="token punctuation">(</span>argc<span class="token punctuation">,</span>argv<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Sets CLI arguments for a pedal once.</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">size_t</span> n <span class="token operator">=</span> <span class="token function">fread</span><span class="token punctuation">(</span>in_i16<span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token class-name">int16_t</span><span class="token punctuation">)</span><span class="token punctuation">,</span> BLOCK_SIZE<span class="token punctuation">,</span> <span class="token constant">stdin</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// read raw data from arecord or previous pedal</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>n <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token keyword">break</span><span class="token punctuation">;</span> <span class="token comment">// abort if no data received</span>
+        <span class="token comment">/* Convert i16 to float */</span>
+        <span class="token function">effect</span><span class="token punctuation">(</span>in_f<span class="token punctuation">,</span> out_f<span class="token punctuation">,</span> n<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// run the effect for the current block of data</span>
+        <span class="token comment">/* Make sure output isn't too loud and convert back to i16 */</span>
+        <span class="token function">fwrite</span><span class="token punctuation">(</span>out_i16<span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token class-name">int16_t</span><span class="token punctuation">)</span><span class="token punctuation">,</span> n<span class="token punctuation">,</span> <span class="token constant">stdout</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// write raw data to next pedal or aplay</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+
+		</div>
+	<p>And a pedal looks something like this:</p>
+
+		<div class="codeblock">
+			<div class="codeblock-header">C</div>
+			<pre class="language-c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">float</span> gain<span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">init_arg</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token operator">*</span>argv<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>argc <span class="token operator">!=</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token comment">// Validate argument count</span>
+    <span class="token function">error</span><span class="token punctuation">(</span><span class="token string">"Invalid arguments"</span><span class="token punctuation">,</span> <span class="token string">"Usage: boost &lt;gain>"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  gain <span class="token operator">=</span> <span class="token function">atof</span><span class="token punctuation">(</span>argv<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Store argument once (arguments starts at 0, check the source code i dare you)</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// Very simple gain pedal</span>
+<span class="token keyword">void</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">float</span> <span class="token operator">*</span>in<span class="token punctuation">,</span> <span class="token keyword">float</span> <span class="token operator">*</span>out<span class="token punctuation">,</span> <span class="token keyword">int</span> n<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> n<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    out<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> in<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">*</span> gain<span class="token punctuation">;</span> <span class="token comment">// this is where math is done, most pedals should be a little more complex than this.</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+
+		</div>
+	<p>That's it. Just a small set of small programs to be chained together to produce cool guitar effects.</p>
+<p>There's also a little helper CLI which keeps you from entering the wrong parameters into arecord and aplay.</p>
+<p>Anyways that's basically it for this post. E-mail me patches <a href="https://git.spelis.li/#patches">Guide</a> for new cool pedals or bugfixes.</p>
+<p>Some of the code is admittedly a little cursed, but honestly if the signal goes in and comes back out sounding cooler, I consider that a success.</p>
+
+			]]></content:encoded>
+		</item>
+		
+		<item>
+			<title>Finally replaced NGINX&#39;s Autoindex</title>
+      <link>https://www.spelis.li/blog/fancyindex/</link>
+      <description>share.spelis.li now uses FancyIndex instead of the built-in Autoindex</description>
+      <pubDate>Tue, 07 Jul 2026 00:00:00 GMT</pubDate>
+      <guid>https://www.spelis.li/blog/fancyindex/</guid>
+
+			<content:encoded><![CDATA[
+					<p>Jeez, I've been dreading this moment for so long, and it wasn't even a hassle.</p>
+<p>So I finally set up FancyIndex for NGINX because the built-in autoindex honestly sucks genuine ass. Okay, maybe that's a little harsh. It works. It lists files. It does exactly what it says on the tin. But aesthetically? It's basically a directory listing with unstyled HTML from the stone age.</p>
+<p>For the longest time I'd been putting this off because I assumed it'd be one of those projects where you spend six hours reading documentation, rebuilding NGINX with some obscure module, sacrificing a goat to the package manager, and still end up with a blank page and three cryptic error messages.</p>
+<p>Instead, it took me a few minutes.</p>
+<p>Most of the work wasn't even getting FancyIndex running. The hardest part was deciding how I wanted it to look. It supports custom headers, footers, CSS, sorting, hiding files, and a bunch of little quality-of-life features that make a file index feel like it actually belongs on your website instead of looking like your web server accidentally exposed a folder.</p>
+<p>The best part is that it's still just a directory listing. No JavaScript monstrosity, no database, no fancy backend. Drop files into a directory (well, only I have FTP access so sucks to be you) and they're immediately available. That's exactly what I wanted.</p>
+<p>I don't know why I kept procrastinating on this one. I guess &quot;I'll do it later&quot; eventually became &quot;I've been saying that for over a year.&quot; Turns out the solution was just... reading the documentation for once.</p>
+<p>As usual, the thing I'd built up in my head as an enormous nightmare turned out to be one of the easiest upgrades I've made to the server.</p>
+<p>I probably should stop doing that.</p>
+<p>...Nah.</p>
+<h3>slight note here</h3>
+<p>The only issue I had was that the CSS href didn't want to work so I just caved and shoved a <code>&lt;link&gt;</code> in the header.html</p>
+
+			]]></content:encoded>
+		</item>
+		
+		<item>
+			<title>Simple synth suite in C</title>
+      <link>https://www.spelis.li/blog/synth/</link>
+      <description>Synth suite using PCM written in C.</description>
+      <pubDate>Wed, 15 Jul 2026 00:00:00 GMT</pubDate>
+      <guid>https://www.spelis.li/blog/synth/</guid>
+
+			<content:encoded><![CDATA[
+					<p>I've been wanting to dabble with MIDI for a while now (since before pipedals) and I finally ordered a keyboard like a month ago, it came the same day as I bought my acoustic bass which was pretty nice. Had a fun time with both of those.</p>
+<p>Now pipedals was cool and all, but it was pretty boring (just digital guitar pedals, could've had a better execution) but with MIDI you can emulate ANY audio with a synth (even sample recordings). Now similarly to pipedals, I don't like the standard way of implementing them; It's too complex for my tiny monkey brain and I haven't really tried making a synth using real production grade tooling, but I'm sure it's basically the same as a VST plugin.</p>
+<p>Now like with pipedals, the entire workflow is now this:</p>
+<p><code>cat /dev/midi* | tiny synth program here :P | aplay ...</code></p>
+<p>That's it. ALSA might be my new favorite thing.</p>
+<p>Now if you couldn't tell, I'm copying alot of the parts from the pipedals post, but eh whatever.</p>
+<p>The shared code every synth uses is something like this: (C pseudocode)</p>
+
+		<div class="codeblock">
+			<div class="codeblock-header">C</div>
+			<pre class="language-c"><code class="language-c"><span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span>argv<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token comment">// let the synth have it's own code for initialization. (set up voices, blabla)</span>
+  <span class="token function">init_synth</span><span class="token punctuation">(</span>argc<span class="token punctuation">,</span> argv<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  midi_event event<span class="token punctuation">;</span>
+  <span class="token class-name">int16_t</span> buf<span class="token punctuation">[</span>BUF_SIZE<span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token comment">// in this case BUF_SIZE is 256, but that's not important.</span>
+
+  <span class="token comment">// FOREVERRRRRR</span>
+  <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> BUF_SIZE<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token function">midi_read</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>event<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment">// Reads a raw MIDI event (It's THREE (or just two) bytes!)</span>
+        <span class="token function">synth_event</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>event<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// let the synth handle events (note_on, note_off, pitch shifting, CC, etc)</span>
+      <span class="token punctuation">}</span>
+      buf<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">synth_sample</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// store the sample</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">write</span><span class="token punctuation">(</span>STDOUT_FILENO<span class="token punctuation">,</span> buf<span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>buf<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// send it over to ALSA (or a file)</span>
+    <span class="token function">sample_sleep</span><span class="token punctuation">(</span>BUF_SIZE<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// prevent overrunning the audio</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token comment">// why is this here?</span>
+<span class="token punctuation">}</span></code></pre>
+
+		</div>
+	<p>And for this project, the synth implementation is a little bit less straightforward but it's still pretty simple.</p>
+<p>And if you didn't notice, the three functions that the synth has to implement are:</p>
+
+		<div class="codeblock">
+			<div class="codeblock-header">C</div>
+			<pre class="language-c"><code class="language-c"><span class="token class-name">int16_t</span> <span class="token function">synth_sample</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">synth_event</span><span class="token punctuation">(</span>midi_event <span class="token operator">*</span>ev<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">init_synth</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span>argv<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+
+		</div>
+	<p>Now: here's an example Square Wave synth</p>
+
+		<div class="codeblock">
+			<div class="codeblock-header">C</div>
+			<pre class="language-c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"synth.lib.h"</span> <span class="token comment">// Don't ask why i named it this... just has some useful constants and utilities.</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdint.h></span> <span class="token comment">// One of my favorite headers</span></span>
+
+synth_voice voices<span class="token punctuation">[</span><span class="token number">128</span><span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token comment">// Each note gets it's own voice. For simplicity. Obviously doesn't need this many, but it provides easy indexing</span>
+
+<span class="token class-name">int16_t</span> <span class="token function">synth_sample</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">float</span> mix <span class="token operator">=</span> <span class="token number">0.0f</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">128</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment">// loop through the voices</span>
+    synth_voice <span class="token operator">*</span>v <span class="token operator">=</span> <span class="token operator">&amp;</span>voices<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>v<span class="token operator">-></span>on<span class="token punctuation">)</span> <span class="token comment">// don't process unused voices</span>
+      <span class="token keyword">continue</span><span class="token punctuation">;</span>
+
+    v<span class="token operator">-></span>phase<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token punctuation">(</span>v<span class="token operator">-></span>freq <span class="token operator">*</span> pitch<span class="token punctuation">)</span> <span class="token operator">/</span> SAMPLE_RATE<span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>v<span class="token operator">-></span>phase<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">>=</span> <span class="token number">1.0f</span><span class="token punctuation">)</span>
+      v<span class="token operator">-></span>phase<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">-=</span> <span class="token number">1.0f</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">float</span> sample <span class="token operator">=</span> v<span class="token operator">-></span>phase<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">&lt;</span> <span class="token number">0.5f</span> <span class="token operator">?</span> <span class="token number">1.0f</span> <span class="token operator">:</span> <span class="token operator">-</span><span class="token number">1.0f</span><span class="token punctuation">;</span> <span class="token comment">// this is the square wave</span>
+
+    mix <span class="token operator">+=</span> sample <span class="token operator">*</span> v<span class="token operator">-></span>velocity <span class="token operator">*</span> <span class="token number">16000.0f</span><span class="token punctuation">;</span> <span class="token comment">// add to the mix</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>mix <span class="token operator">></span> INT16_MAX<span class="token punctuation">)</span> <span class="token comment">// hard clamp the output</span>
+    mix <span class="token operator">=</span> INT16_MAX<span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>mix <span class="token operator">&lt;</span> INT16_MIN<span class="token punctuation">)</span>
+    mix <span class="token operator">=</span> INT16_MIN<span class="token punctuation">;</span>
+
+  <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token class-name">int16_t</span><span class="token punctuation">)</span>mix<span class="token punctuation">;</span> <span class="token comment">// return the sample</span>
+<span class="token punctuation">}</span></code></pre>
+
+		</div>
+	<p>The init code is super simple, don't even know why I'm showing you.</p>
+
+		<div class="codeblock">
+			<div class="codeblock-header">C</div>
+			<pre class="language-c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">init_voices</span><span class="token punctuation">(</span>synth_voice <span class="token operator">*</span>voices<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">128</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment">// loop through all 128 voices</span>
+    <span class="token function">memset</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>voices<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>synth_voice<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// default for most fields is 0.</span>
+    voices<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>freq <span class="token operator">=</span> <span class="token number">440.0f</span> <span class="token operator">*</span> <span class="token function">powf</span><span class="token punctuation">(</span><span class="token number">2.0f</span><span class="token punctuation">,</span> <span class="token punctuation">(</span>i <span class="token operator">-</span> <span class="token number">69.0f</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">12.0f</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// calculate frequency for a given note</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">init_synth</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span>argv<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> 
+    <span class="token function">init_voices</span><span class="token punctuation">(</span>voices<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// the global we defined earlier</span>
+<span class="token punctuation">}</span></code></pre>
+
+		</div>
+	<p>And event handling (boring)</p>
+
+		<div class="codeblock">
+			<div class="codeblock-header">C</div>
+			<pre class="language-c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">synth_event</span><span class="token punctuation">(</span>midi_event <span class="token operator">*</span>ev<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token class-name">uint8_t</span> note <span class="token operator">=</span> ev<span class="token operator">-></span>data<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>ev<span class="token operator">-></span>type <span class="token operator">==</span> MIDI_NOTE_ON<span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment">// turn on a note (press)</span>
+    voices<span class="token punctuation">[</span>note<span class="token punctuation">]</span><span class="token punctuation">.</span>on <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    voices<span class="token punctuation">[</span>note<span class="token punctuation">]</span><span class="token punctuation">.</span>releasing <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    voices<span class="token punctuation">[</span>note<span class="token punctuation">]</span><span class="token punctuation">.</span>velocity <span class="token operator">=</span> ev<span class="token operator">-></span>data<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">/</span> <span class="token number">127.0f</span><span class="token punctuation">;</span>
+
+    voices<span class="token punctuation">[</span>note<span class="token punctuation">]</span><span class="token punctuation">.</span>phase<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">0.0f</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>ev<span class="token operator">-></span>type <span class="token operator">==</span> MIDI_NOTE_OFF<span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment">// turn off a note (release)</span>
+    voices<span class="token punctuation">[</span>note<span class="token punctuation">]</span><span class="token punctuation">.</span>on <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+
+		</div>
+	<p>The <code>midi_event</code> struct is a simplified representation of a raw MIDI message. In the actual MIDI data, the first byte contains both the message type and the channel</p>
+<pre><code>TTTTCCCC
+</code></pre>
+<p>where <code>T</code> is the message type and <code>C</code> is the MIDI channel. The parser splits this byte into two separate fields, giving the synth easier access to them:</p>
+
+		<div class="codeblock">
+			<div class="codeblock-header">C</div>
+			<pre class="language-c"><code class="language-c"><span class="token keyword">typedef</span> <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+  <span class="token class-name">uint8_t</span> type<span class="token punctuation">;</span>
+  <span class="token class-name">uint8_t</span> chan<span class="token punctuation">;</span>
+  <span class="token class-name">uint8_t</span> data<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> midi_event<span class="token punctuation">;</span></code></pre>
+
+		</div>
+	<p>The remaining bytes are stored in <code>data</code>. Most common messages have two data bytes, but some MIDI messages only have one, so the synth has to know how many bytes to read depending on the message type.</p>
+<p>And now I'm tired of writing (If only I wrote like this in school). But as you can see, It's actually pretty simple.</p>
+<p>Now unlike pipedals there's no helper CLI, just rawdog <code>aplay</code> lol.</p>
+<p>I had some more improvements to the code, so if you're interested check it out!</p>
+
+			]]></content:encoded>
+		</item>
+		
+		<item>
+			<title>Now this site is hosted on GitHub Pages.</title>
+      <link>https://www.spelis.li/blog/github-pages/</link>
+      <description>I put my site on GitHub pages for stability</description>
+      <pubDate>Thu, 16 Jul 2026 00:00:00 GMT</pubDate>
+      <guid>https://www.spelis.li/blog/github-pages/</guid>
+
+			<content:encoded><![CDATA[
+					<p>Yet another short post, just wanted to announce that this website will be hosted through GitHub pages (because it's static anyway) but source code will still be hosted here.</p>
+<p>Now I'm still hosting Git, Files, Shortlinks so if theres an outage on my part, only those will be down.</p>
+<p>Currently it's set so nginx will redirect to www.spelis.li if theres no shortlink on the current path. So shortlinks still work :)</p>
+<p>Also I have a pretty cool GitHub workflow to build and deploy the site at the click of a button. Neet</p>
+
+			]]></content:encoded>
+		</item>
+		
+		<item>
+			<title>Minesweeper on the Nintendo DS</title>
+      <link>https://www.spelis.li/blog/dsmine/</link>
+      <description>A simple Minesweeper clone written in C for the Nintendo DS.</description>
+      <pubDate>Tue, 04 Aug 2026 00:00:00 GMT</pubDate>
+      <guid>https://www.spelis.li/blog/dsmine/</guid>
+
+			<content:encoded><![CDATA[
+					<p>At some point last year, I had the brilliant idea of making a <a href="https://github.com/Spelis/DSMine">Minesweeper</a> game for the Nintendo DS. But we don't talk about that one.</p>
+<p>At some point this year though, pretty recently I decided to take <a href="https://git.spelis.li/Spelis/DSMine">another shot</a> at the exact same idea, but with better knowledge on how to work with the system and just generally being better at programming.</p>
+<p>Why? I don't know. I don't know why I decided to make either of the iterations of it. There are definitely easier platforms to make Minesweeper for. A <a href="https://minesweeper.online/">website</a> already exists. A desktop application exists. I could've made one in like an afternoon and moved on with my life.</p>
+<p>Instead I chose the path of &quot;What if I made it run on a handheld from 2004?&quot;</p>
+<p>Ah fuck.</p>
+<h2>Starting the project</h2>
+<p>The goal was simple: make a proper Minesweeper experience that feels like it belongs on the DS. The game uses the DS screens, buttons, and touch input for the game to actually feel like a handheld game rather than &quot;Minesweeper port #323679392&quot; just slapped onto the hardware.</p>
+<p>Obviously, the gameplay is the same as the original has always been: reveal tiles, avoid mines, flag shit, and occasionally gamble with your (digital minesweeper) life.</p>
+<p>The interesting part wasn't implementing Minesweeper itself. The rules are dead simple. The fun part lies in figuring out how to design it for the DS, making art, creating an &quot;engine&quot; (if you can even call it that, the new code is just a less duct taped banana on a wall and some spaghetti somehow on top of it while still keeping it there)</p>
+<h2>Designing around the DS</h2>
+<p>The DS has two screens (I think DS stands for Dual Screen if I recall correctly.), so one of the first things I had to decide was figuring out what shit I wanted on each screen.</p>
+<p>The bottom screen houses some big buttons on the left, one is to reset the game, and at the same show your game status (Smiley means you're alive, the dead guy means your ass passed away from an explosion, some mf with sunglasses means you win. Good fucking job lad.), then there's also two more buttons, letting you control bombs and grid size respectively. The bottom screen also holds the grid, on the right/middle of the screen. it goes from 2x2 to 22x22 in size and bombs can go up to the grid size minus 1. Also neat thing: I implemented RNG protection, so that your first move can NEVER be a bomb.</p>
+<p>The top screen is pretty de-cluttered, holding just your how many bombs subtracted by the amount of flags you've placed, a timer, a game logo, and my logo.</p>
+<p>The game also has touchscreen controls. If you're lucky I have enough energy to write about it below. (<a href="#Controls">I did</a>)</p>
+<h2>Working with devkitPro and libnds</h2>
+<p>The game is built using <a href="https://devkitpro.org/">devkitPro</a> (dkp) and the Nintendo DS development libraries that it provides. (fun fact, I was using dkp containerized in the beginning of the project, because I had bad experiences with it on Linux in the past)</p>
+<p>Getting started with DS development is both fun and absolutely gut wrenching depending on how it goes for you. You are really close to the hardware which depending on how you look at it is both very fun and sometimes very horrible (mainly due to lack of debugging). But honestly I managed to make a great game (in my opinion ofc) and maybe you can too. Also on the DS you usually use tiled background modes which require you to assemble backgrounds (in my case the entire game) with 8x8 tiles.</p>
+<p>The graphics pipeline on the DS is kind of restricting, Instead of throwing an arbitrarily colored and sized image on the screen, you first need to worry about palettes, tiles, background modes, and maybe some more shit.</p>
+<p>Using tools like grit (included with dkp) help alot because they convert your images (in this case .bmp) to formats the DS can understand, and it also generated palettes.</p>
+<h2>Working with Audio and shit</h2>
+<p>For music and sound effects, i used MaxMod. (like many others before me)</p>
+<p>The audio system is one of those places where older hardware shows its personality. You can't really just load a random audio file from disk and play it. You have to prepare assets in the right format and use the tools designed for the platform. Not to mention these get baked into the ROM of the game.</p>
+<p>Honestly, the setup was kind of underwhelming, there were parts I had to change in the Makefile (honestly might've genuinely taken me an hour) but the rest was smooth sailing.</p>
+<p>Adding the singular music track to the game was a whole different beast though, because I've never used a tracker (bullshit retro ahh software you make music in) I had to learn that, which was hard. (actually just made the track in LMMS and exported it to a .mid file and imported it into OpenMPT) finally after literal HOURS of trying, I got the track in (deadass just a bass track, cause I love bass so much. and the only way to mute the music is to mute your entire DS)</p>
+<p>Actually, since one, two or three versions ago, I swapped the track for an atmospheric synth sample with some chords.</p>
+<p>And I actually made a volume control for music and sfx</p>
+<h2>The annoying parts</h2>
+<p>Of course, working with ancient hardware is bound to come with challenges (I already mentioned a few)</p>
+<p>DS development has a lot of small details that are easy to get wrong. A wrong background configuration (this was actually the demise of a different attempt at this game, which I didn't tell you about) can (pretty obviously) end up with literally nothing showing up on screen.</p>
+<p>Then you spend your beautiful 2, 20, 200 minutes trying to debug it (YOU CANTTTTT BECAUSE THERE IS NO SCREENNNN) and wondering where you went wrong, eventually doing an ancient ritual for the Nintendo gods before it finally agrees to display your dumpster fire.</p>
+<p>(The ritual is usually &quot;read the documentation&quot;)</p>
+<p>Fortunately libnds has documentation.</p>
+<h2>What I learned.</h2>
+<p>Surprisingly little if I think about it, maybe if I ponder more I'll realize how far I've come.</p>
+<p>Making a Minesweeper clone for the DS isn't exactly pushing the limits of any hardware. The only limit I'm pushing is palette sizes.</p>
+<p>Now the Nintendo DS can play Minesweeper. (Someone has definitely made this before)</p>
+<h1 id="Controls">Controls</h1>
+<h2>While on the grid</h2>
+<ul>
+<li><strong>A:</strong> Reveal tile</li>
+<li><strong>B:</strong> Flag tile</li>
+<li><strong>D-Pad:</strong> Move the cursor</li>
+</ul>
+<h2>While in the menu</h2>
+<ul>
+<li><strong>A:</strong> Activate the selected button</li>
+<li><strong>D-Pad:</strong>
+<ul>
+<li><strong>Up &amp; Down:</strong> Navigate menu buttons</li>
+<li><strong>Left &amp; Right:</strong> Change values on buttons that support it</li>
+</ul>
+</li>
+</ul>
+<h3>Menu items</h3>
+<ol>
+<li><strong>Face:</strong> Shows the current game status
+<ul>
+<li>Pressing it (A or touch) resets the grid</li>
+</ul>
+</li>
+<li><strong>Bomb count:</strong> Change the number of bombs (D-Pad)</li>
+<li><strong>Grid size:</strong> Change the grid size (<code>x*x</code>) (D-Pad)</li>
+<li><strong>Difficulty:</strong> Scroll through difficulty presets (D-Pad)</li>
+<li><strong>Music Volume:</strong> Set music volume (D-Pad)</li>
+<li><strong>SFX Volume:</strong> Set the volume of sound effects (D-Pad)</li>
+</ol>
+<h2>Anywhere</h2>
+<ul>
+<li><strong>Select:</strong> Switch the cursor between the grid and menu</li>
+<li><strong>Start:</strong> Reset the grid</li>
+</ul>
+<h2>Touch</h2>
+<ul>
+<li><strong>Grid tiles:</strong> Tap an unselected tile to move the cursor there. Tap it again to reveal. Hold for .25s to flag</li>
+<li><strong>Menu items:</strong> Tap to navigate and activate buttons.</li>
+</ul>
+<p>Ouu shii it's 3 AM.<br>
+Yes I wrote this at night time and my legs hurt because for some reason I need another growth spurt.<br>
+I blame this for my horrible writing (please ignore the sentences that seem like they feel down a damn staircase)<br>
+(This blog post is 7 kilobytes big)</p>
+<p>I may have slightly overexplained Minesweeper.</p>
+<p>But it's fine, because this is a completely different Minesweeper. This one has:</p>
+<ul>
+<li>two screens</li>
+<li>a cursed tile-based graphics pipeline</li>
+<li>a soundtrack consisting mostly of me asking &quot;why won't OpenMPT do the thing&quot;</li>
+</ul>
+<p>Totally different. Trust me.</p>
+<p>Also download <a href="https://git.spelis.li/Spelis/DSMine/releases">here</a></p>
+
+			]]></content:encoded>
+		</item>
+		
+		<item>
+			<title>This is a filler post</title>
+      <link>https://www.spelis.li/blog/filler/</link>
+      <description>I&#39;m still alive, I guess?</description>
+      <pubDate>Sun, 11 Oct 2026 00:00:00 GMT</pubDate>
+      <guid>https://www.spelis.li/blog/filler/</guid>
+
+			<content:encoded><![CDATA[
+					<p>It's been a bit since I've written anything here, and I'd love to say that's because I've been busy working on something interesting... Unfortunately that would be a fat fucking lie.</p>
+<p>I have mostly just been performing my usual routine of messing around with projects, writing code, breaking things that worked perfectly five minutes ago, and whatever other shenanigans I decide to do.</p>
+<p>There hasn't really been anything worth writing a dedicated post about.</p>
+<p>I started high school a while ago, so that's been taking up some of the time I had during summer break.</p>
+<p>My high school has a programming class and that's fun, but it's more like a &quot;Programming 101&quot; rather than something more advanced, I'm not exactly a beginner (but I for sure am not good either). I have uploaded all my code to a private git repo so that's also fun</p>
+<p>Also for <a href="https://git.spelis.li/Spelis/str">my string library</a> I updated the build system a while back to use a single header rather than a header + .a/.so</p>
+<p>Anyways, I'm still alive (Portal reference?), still coding, still cooking up nothing burgers</p>
+<p>Hopefully, my next post won't be in such a long time...</p>
+
+			]]></content:encoded>
+		</item>
+		
+		<item>
+			<title>My C (de)serialization library</title>
+      <link>https://www.spelis.li/blog/sol/</link>
+      <description>SOL is my simple (de)serialization library for C.</description>
+      <pubDate>Fri, 13 Nov 2026 00:00:00 GMT</pubDate>
+      <guid>https://www.spelis.li/blog/sol/</guid>
+
+			<content:encoded><![CDATA[
+					<p>I've been working on a little project called <a href="https://git.spelis.li/spelis/sol"><strong>SOL</strong></a> (Spelis's Object Language). It's a lightweight data serialization library written in C, with a syntax loosely inspired by JSON.</p>
+<p>The idea behind SOL is relatively simple: provide a straightforward way to represent, manipulate and serialize structured data without depending on a massive external library.</p>
+<h1>Why SOL?</h1>
+<p>I wanted something that was relatively simple to integrate into C projects, while still providing the convenience of working with structured data.</p>
+<p>JSON is great, but I wanted to experiment with designing my own format and implementing the entire thing myself.</p>
+<p>SOL supports values such as null, booleans, integers, floating-point numbers, strings, characters, arrays and objects.</p>
+<h2>A different take on JSON</h2>
+<p>SOL borrows quite a bit from JSON, but its syntax is deliberately more relaxed.</p>
+<p>For example, objects and arrays don't require commas between entries, and assignments don't necessarily require an <code>=</code> or <code>:</code>.</p>
+<p>This makes the format a little less strict than JSON while retaining a familiar structure, which is nice when you inevitably forget a comma somewhere.</p>
+<p>(I've seen people do that, and it's a very valid mistake.)</p>
+<h2>Written in C</h2>
+<p>The core library is written in C, with a relatively small API for parsing, creating, manipulating, and freeing values.</p>
+<p>The library includes macros only possible for C11, but if you are compiling for a C standard lower than that, those macros get disabled and compatibility goes down to C99.</p>
+<h2>Beyond C</h2>
+<p>Although the library is written in C, I've started experimenting with bindings for other languages.</p>
+<p>Currently, this includes a C++ wrapper and LuaJIT FFI bindings.</p>
+<p>The goal is to make SOL usable from different environments without having to maintain entirely separate implementations.</p>
+<h1>What's next?</h1>
+<p>SOL is still mostly a work in progress. There's not much more I want to do with the parser/language itself, but I would enjoy making more bindings, notably for Python, Nim, Java, and maybe JavaScript.</p>
+<p>One more thing I would like to add is maybe not making the stringifier/formatter throw away your precious comments, it's not very nice of it to do.</p>
+<h1>One more thing</h1>
+<p>I hope you'll enjoy my library if you decide to use it and I should probably show you an example of how it's used, there are some examples in the repo under <code>examples/</code>.<br>
+This is the <code>examples/hello_arr.c</code> example with some extra comments added.</p>
+
+		<div class="codeblock">
+			<div class="codeblock-header">C</div>
+			<pre class="language-c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"sol.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token comment">// ["Hello" ", " "World", '! '\n]</span>
+  <span class="token keyword">const</span> <span class="token keyword">char</span> source<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">"[\"Hello\" \", \" \"World\", '! '\\n]"</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// define value root value pointers and parse source</span>
+  sol_value <span class="token operator">*</span>v<span class="token punctuation">;</span>
+  sol_error <span class="token operator">*</span>e <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+  bool success <span class="token operator">=</span> <span class="token function">sol_parse</span><span class="token punctuation">(</span>source<span class="token punctuation">,</span> <span class="token operator">&amp;</span>v<span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// check if it was successful</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>success<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">sol_print_error</span><span class="token punctuation">(</span><span class="token operator">*</span>e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">sol_free_error</span><span class="token punctuation">(</span><span class="token operator">*</span>e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment">// check if our root value is an array</span>
+  <span class="token comment">// in this case it always is.</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">sol_value_type</span><span class="token punctuation">(</span>v<span class="token punctuation">)</span> <span class="token operator">==</span> SOL_ARRAY<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// get the underlying array</span>
+    sol_array <span class="token operator">*</span>arr <span class="token operator">=</span> <span class="token function">sol_get_value</span><span class="token punctuation">(</span>sol_array <span class="token operator">*</span><span class="token punctuation">,</span> v<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// we can replace "World" with "SOL"</span>
+    <span class="token function">sol_array_set</span><span class="token punctuation">(</span>arr<span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token function">sol_new_value</span><span class="token punctuation">(</span><span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token string">"SOL"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// loop over and print</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">size_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token function">sol_array_size</span><span class="token punctuation">(</span>arr<span class="token punctuation">)</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">const</span> sol_value <span class="token operator">*</span>val <span class="token operator">=</span> <span class="token function">sol_array_get</span><span class="token punctuation">(</span>arr<span class="token punctuation">,</span> i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">sol_value_type</span><span class="token punctuation">(</span>val<span class="token punctuation">)</span> <span class="token operator">==</span> SOL_STRING<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        sol_string s <span class="token operator">=</span> <span class="token function">sol_get_value</span><span class="token punctuation">(</span><span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">,</span> val<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"%.*s"</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span>s<span class="token punctuation">.</span>length<span class="token punctuation">,</span> s<span class="token punctuation">.</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">sol_value_type</span><span class="token punctuation">(</span>val<span class="token punctuation">)</span> <span class="token operator">==</span> SOL_CHARACTER<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token punctuation">,</span> <span class="token function">sol_get_value</span><span class="token punctuation">(</span><span class="token keyword">char</span><span class="token punctuation">,</span> val<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment">// completely optional, but check how much memory the object uses.</span>
+  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"mem: %zu bytes\n"</span><span class="token punctuation">,</span> <span class="token function">sol_value_memory_usage</span><span class="token punctuation">(</span>v<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// free your value to avoid memory leaks.</span>
+  <span class="token function">sol_free</span><span class="token punctuation">(</span>v<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+
+		</div>
+	<p>You can find the source code repository here:</p>
+<p><a href="https://git.spelis.li/spelis/sol">Link to the repository</a></p>
+
+			]]></content:encoded>
+		</item>
+		
+	</channel>
+</rss>
